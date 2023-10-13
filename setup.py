@@ -13,8 +13,7 @@ build_options = {
     "excludes": ["tkinter"],  # Exclude tkinter if not needed
     "include_files": ["app/__init__.py",
                       "app/models.py",
-                      "app/routes.py",
-                      "migrate_db.py"],  # Include any data files
+                      "app/routes.py"],  # Include any data files
     "includes": ["flask",
                  "flask_sqlalchemy",
                  "flask_migrate",
@@ -23,7 +22,10 @@ build_options = {
                  "json",
                  "re",
                  "urllib",
-                 "sqlalchemy"],  # Include the SQLite module
+                 "sqlalchemy",
+                 "sys",
+                 "subprocess",
+                 "shutil"],  # Include the SQLite module
 }
 
 # Create setup configuration

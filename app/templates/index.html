@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITA Test Report</title>
+    <!-- Include Bootstrap CSS (adjust the path to your Bootstrap CSS file) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Custom CSS for styling -->
+    <style>
+        .session-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* Adjust column widths as needed */
+            gap: 10px;
+        }
+
+        .grid-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .result-badge {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .test-case {
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        .badge-dark-red {
+            background-color: #8B0000; /* Dark Red */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .badge-blue {
+            background-color: #0074D9; /* Blue */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .badge-black {
+            background-color: #000000; /* Black */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .badge-dark-blue {
+            background-color: #00008B; /* Dark Blue */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .badge-grey1 {
+            background-color: #708080; /* Grey */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .badge-grey2 {
+            background-color: #717481; /* Grey */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .bg-dark-red {
+            background-color: #8B0000; /* Dark Red */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .bg-blue {
+            background-color: #0074D9; /* Blue */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .bg-grey1 {
+            background-color: #708080; /* Grey */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        .bg-grey2 {
+            background-color: #717481; /* Grey */
+            color: #FFF; /* Text color for visibility */
+        }
+
+        /* Progress bar style */
+        .progress {
+            height: 25px;
+        }
+
+         /* Custom CSS for increasing the height of the progress bar */
+        .custom-progress {
+            height: 60px; /* Adjust the height as needed */
+        }
+
+        /* Add your custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            padding-top: 20px;
+        }
+
+        /* Styling for the tree structure */
+        .collapsible-tree {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .tree-node {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Different font sizes for tree hierarchy levels */
+        .tree-node.level-1 {
+            font-size: 24px;
+        }
+
+        .tree-node.level-2 {
+            font-size: 20px;
+        }
+
+        .tree-node.level-3 {
+            font-size: 16px;
+        }
+
+        .tree-node.level-4 {
+            font-size: 14px;
+        }
+
+        .tree-node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #d1d3d4;
+        }
+
+        .sub-suites {
+            list-style-type: none;
+            padding-left: 0;
+            margin-left: 20px;
+        }
+
+        .sub-suites-elems {
+            list-style-type: none;
+            padding-left: 0;
+            margin-left: 20px;
+            display: none;
+            /* Set the initial scale to 1 to maintain the original size */
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        /* Visual hover effect for sub-suites */
+        .sub-suites:hover {
+            background-color: transparent;
+        }
+
+        /* CSS */
+        #logPreviewModal .modal-body {
+            max-height: 400px; /* Adjust this value as needed */
+            max-width: 1500px; /* Adjust this value as needed */
+            overflow-y: auto;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>
+            EB ITA Test Run
+            {% if overall_result == "FAILED" %}
+            <span class="badge badge-danger">FAILED</span>
+            {% else %}
+            <span class="badge badge-success">PASSED</span>
+            {% endif %}
+        </h1>
+        <ul class="list-group mt-3">
+            {% for session in test_sessions %}
+            <li class="list-group-item session-card">
+                <h5 class="mb-3">{{ session.report_title }}</h5>
+                <div class="row">
+                    <div class="col-6"><strong>Start Time:</strong></div>
+                    <div class="col-6">{{ session.start_time }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>End Time:</strong></div>
+                    <div class="col-6">{{ session.end_time }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Root Suite UID:</strong></div>
+                    <div class="col-6">{{ session.root_suite_uid }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Configuration:</strong></div>
+                    <div class="col-6">{{ session.configuration }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Test Count:</strong></div>
+                    <div class="col-6">
+                        <span style="font-size: 30px;" class="result-badge badge badge-dark-blue">
+                            {{ session.result_summary['test_count'] }}
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Result Summary:</strong></div>
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-6" data-text-type="passed">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-success">
+                                    Pass Count: {{ session.result_summary['pass_count'] }}
+                                </span>
+                            </div>
+                            <div class="col-6" data-text-type="failed">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-danger">
+                                    Fail Count: {{ session.result_summary['fail_count'] }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6" data-text-type="error">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-dark-red">
+                                    Error Count: {{ session.result_summary['error_count'] }}
+                                </span>
+                            </div>
+                            <div class="col-6" data-text-type="skipped">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-warning">
+                                    Skipped Count: {{ session.result_summary['skipped_count'] }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6" data-text-type="timeout">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-blue">
+                                    Timeout Count: {{ session.result_summary['timeout_count'] }}
+                                </span>
+                            </div>
+                            <div class="col-6" data-text-type="expected_fail">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-grey1">
+                                    Exp. Fail Count: {{ session.result_summary['expected_fail_count'] }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6" data-text-type="unexpected_pass">
+                                <span style="font-size: 25px; cursor: pointer;" class="result-badge badge badge-grey2">
+                                    Unexp. Pass Count: {{ session.result_summary['unexpected_pass_count'] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Progress bars for percentages -->
+                <div class="progress mt-3 custom-progress">
+                    <div class="progress-bar bg-success cool-loading" role="progressbar" style="font-size: 20px;" aria-valuenow="{{ pass_percentage }}" aria-valuemin="0" aria-valuemax="100" data-start-width="0" data-end-width="{{ pass_percentage }}">{{ pass_percentage }}%</div>
+                    <div class="progress-bar bg-danger cool-loading" role="progressbar" style="font-size: 20px;" aria-valuenow="{{ fail_percentage }}" aria-valuemin="0" aria-valuemax="100" data-start-width="0" data-end-width="{{ fail_percentage }}">{{ fail_percentage }}%</div>
+                    <div class="progress-bar bg-dark-red cool-loading" role="progressbar" style="font-size: 20px;" aria-valuenow="{{ error_percentage }}" aria-valuemin="0" aria-valuemax="100" data-start-width="0" data-end-width="{{ error_percentage }}">{{ error_percentage }}%</div>
+                    <div class="progress-bar bg-blue cool-loading" role="progressbar" style="font-size: 20px;" aria-valuenow="{{ timeout_percentage }}" aria-valuemin="0" aria-valuemax="100" data-start-width="0" data-end-width="{{ timeout_percentage }}">{{ timeout_percentage }}%</div>
+                    <div class="progress-bar bg-grey1 cool-loading" role="progressbar" style="font-size: 20px;" aria-valuenow="{{ expected_fail_percentage }}" aria-valuemin="0" aria-valuemax="100" data-start-width="0" data-end-width="{{ expected_fail_percentage }}">{{ expected_fail_percentage }}%</div>
+                    <div class="progress-bar bg-grey2 cool-loading" role="progressbar" style="font-size: 20px;" aria-valuenow="{{ unexpected_pass_percentage }}" aria-valuemin="0" aria-valuemax="100" data-start-width="0" data-end-width="{{ unexpected_pass_percentage }}">{{ unexpected_pass_percentage }}%</div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        <br>
+        <div id="table-container"></div>
+        <br>
+        <!-- Add a modal for the log preview -->
+        <div class="modal fade" id="logPreviewModal" tabindex="-1" role="dialog" aria-labelledby="logPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content custom-modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logPreviewModalLabel">Log Preview</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Log entries will be displayed here -->
+                        <div id="logPreviewContainer"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <h1>Test Execution Order</h1>
+        <!-- Replace your existing tree with this -->
+        <ul class="list-group collapsible-tree" id="suite-tree">
+            {% if test_suites %}
+                {% for root_suite_id, root_suite in test_suites.items() %}
+                    <li class="list-group-item list-group-item-action tree-node level-1">
+                        <label class="suite-label">
+                            <span class="suite-name" data-suite-id="{{root_suite_id}}"> {{ root_suite.suite_uid }} (TS)</span>
+                        </label>
+                        <!-- Move the <ul> element inside the <li> element -->
+                        <ul class="sub-suites list-group">
+                            {{ render_suite_tree(root_suite) | safe }}
+                        </ul>
+                    </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery (adjust the paths to your Bootstrap and jQuery JS files) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const suiteTree = document.getElementById("suite-tree");
+
+            suiteTree.addEventListener("click", function (event) {
+                const clickedElement = event.target;
+
+                if (clickedElement.classList.contains("suite-name")) {
+                    // Find the parent <li> element containing the clicked span
+                    const parentLi = clickedElement.closest("li");
+
+                    if (parentLi) {
+                        // Find the sub-suites list within the parent <li>
+                        const subSuites = parentLi.querySelector(".sub-suites");
+
+                        if (subSuites) {
+                            // Toggle the visibility of sub-suites
+                            if (subSuites.style.display === "none" || subSuites.style.display === "") {
+                                subSuites.style.display = "block";
+                            } else {
+                                subSuites.style.display = "none";
+                            }
+                        }
+
+                        // Find the sub-suites elements within the parent <li>
+                        const subSuitesElems = parentLi.querySelector(".sub-suites-elems");
+
+                        if (subSuitesElems) {
+                            // Toggle the visibility of sub-suites-elems
+                            if (subSuitesElems.style.display === "none" || subSuitesElems.style.display === "") {
+                                subSuitesElems.style.display = "block";
+                            } else {
+                                subSuitesElems.style.display = "none";
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const divItems = document.querySelectorAll(".col-6");
+
+            divItems.forEach((divItem) => {
+                divItem.addEventListener("click", function() {
+                    // Extract the data-text-type attribute to determine the text type
+                    const textType = divItem.getAttribute("data-text-type")
+
+                     // Check if the textType is not null before making the fetch request
+                    if (textType !== null) {
+                        // Set badge_color based on textType
+                        if (textType === "passed") {
+                            badge_color = "success";
+                        } else if (textType === "failed") {
+                            badge_color = "danger";
+                        } else if (textType === "error") {
+                            badge_color = "dark-red";
+                        } else if (textType === "skipped") {
+                            badge_color = "warning";
+                        } else if (textType === "timeout") {
+                            badge_color = "blue";
+                        } else if (textType === "expected_fail") {
+                            badge_color = "grey1";
+                        } else {
+                            badge_color = "grey2";
+                        }
+
+                        // Make an AJAX request to fetch the data from the Flask function
+                        fetch(`/get_test_cases_by_result_code?result_code=${encodeURIComponent(textType)}`, {
+                            method: "GET",
+                        })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            // Create and populate the Bootstrap table
+                            const tableContainer = document.getElementById("table-container");
+                            tableContainer.innerHTML = createTable(data, badge_color);
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching data: " + error);
+                        });
+                    }
+                });
+            });
+        });
+
+        // Function to create the Bootstrap table HTML
+        function createTable(data, badge_color) {
+            let tableHTML = '<table class="table table-bordered table-striped">';
+            tableHTML += '<thead>';
+            tableHTML += '<tr>';
+            tableHTML += '<th>Test Case Exec ID</th>';
+            tableHTML += '<th>Test Case UID</th>';
+            tableHTML += '<th style="display: none;">Test Case Method</th>';
+            tableHTML += '<th>Start Time</th>';
+            tableHTML += '<th>End Time</th>';
+            tableHTML += '<th>Result</th>';
+            tableHTML += '</tr>';
+            tableHTML += '</thead>';
+            tableHTML += '<tbody>';
+
+            data.forEach((row) => {
+                tableHTML += '<tr>';
+                tableHTML += `<td>${row[0]}</td>`;
+                tableHTML += `<td>${row[1]}</td>`;
+                tableHTML += `<td style="display: none;" data-method="${row[2]}">${row[2]}</td>`;
+                tableHTML += `<td>${row[3]}</td>`;
+                tableHTML += `<td>${row[4]}</td>`;
+                tableHTML += `<td><span class="result-badge badge badge-${badge_color}" onmouseenter="zoomIn(this)" onmouseleave="zoomOut(this)" style="cursor: zoom-in;">${row[5]}</span></td>`;
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody>';
+            tableHTML += '</table>';
+
+            return tableHTML;
+        }
+    </script>
+    <script>
+        // Get all sub suites elems
+        const subSuitesElems = document.querySelectorAll('.result-badge');
+        const testCase = document.querySelectorAll('.test-case');
+        const suiteLabel = document.querySelectorAll('.suite-label');
+
+        // Add a hover event listener for each sub suites elem
+        subSuitesElems.forEach((elem) => {
+            elem.addEventListener('mouseenter', () => {
+                elem.style.transition = 'transform 0.3s ease';
+                elem.style.transform = 'scale(1.5)';
+            });
+            elem.addEventListener('mouseleave', () => {
+                // Reset the zoom effect when the mouse leaves
+                elem.style.transform = 'scale(1)';
+            });
+        });
+        // Add a hover event listener for each test case
+        testCase.forEach((elem) => {
+            elem.addEventListener('mouseenter', () => {
+                elem.style.transition = 'transform 0.3s ease';
+                elem.style.transform = 'scale(1.4)';
+            });
+            elem.addEventListener('mouseleave', () => {
+                // Reset the zoom effect when the mouse leaves
+                elem.style.transform = 'scale(1)';
+            });
+        });
+        // Add a hover event listener for each test suite label
+        suiteLabel.forEach((elem) => {
+            elem.addEventListener('mouseenter', () => {
+                elem.style.transition = 'transform 0.3s ease';
+                elem.style.transform = 'scale(1.4)';
+            });
+            elem.addEventListener('mouseleave', () => {
+                // Reset the zoom effect when the mouse leaves
+                elem.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+    <script>
+        function zoomIn(element) {
+            element.style.transition = 'transform 0.3s ease';
+            element.style.transform = 'scale(1.5)';
+        }
+
+        function zoomOut(element) {
+            element.style.transition = 'transform 0.3s ease';
+            element.style.transform = 'scale(1)';
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tableContainer = document.getElementById("table-container");
+
+            tableContainer.addEventListener("click", function(event) {
+                const clickedElement = event.target;
+
+                if (clickedElement.classList.contains("result-badge")) {
+                    // Get badge color from the clicked element's class
+                    const badgeColor = getBadgeColor(clickedElement);
+                    const testCaseExecId = clickedElement.closest('tr').querySelector('td:nth-child(1)').textContent;
+                    const testCaseMethod = clickedElement.closest('tr').querySelector('td:nth-child(3)').getAttribute('data-method');
+                    // Fetch log entries for the selected Test Case Exec ID
+                    fetchLogEntries(testCaseExecId, testCaseMethod, badgeColor);
+                }
+            });
+        });
+
+        function getBadgeColor(element) {
+            const classList = element.classList;
+
+            for (const className of classList) {
+                if (className.startsWith("badge-")) {
+                    // Extract the color from the class name (e.g., "badge-danger" -> "danger")
+                    const color = className.replace("badge-", "");
+                    return color;
+                }
+            }
+            // Return default color, if no matching class is found
+            return "success";
+        }
+
+        function fetchLogEntries(testCaseExecId, testCaseMethod, badgeColor) {
+           // Make an AJAX request to fetch the log entries
+           fetch(`/get_log_report?test_case_exec_id=${encodeURIComponent(testCaseExecId)}`, {
+                method: "GET",
+           })
+           .then((response) => response.json())
+           .then((data) => {
+                const logPreviewContainer = document.getElementById("logPreviewContainer");
+                logPreviewContainer.innerHTML = createLogPreview(data, testCaseMethod, badgeColor);
+
+                // Show the log preview modal
+                $("#logPreviewModal").modal("show");
+           })
+           .catch((error) => {
+                console.log("Error fetching log entries: " + error);
+           });
+        }
+
+        function createLogPreview(logEntries, testCaseMethod, badgeColor) {
+            let logPreviewHTML = '<table class="table table-bordered table-striped">';
+            // Add a row for the test method name before the <thead>
+            logPreviewHTML += '<tbody>';
+            logPreviewHTML += '<tr>';
+            logPreviewHTML += `<td colspan="2" style="text-align: center; background-color: #333; color: #fff; font-weight: bold;">TestMethod: ${testCaseMethod}</td>`;
+            logPreviewHTML += '</tr>';
+            logPreviewHTML += '</tbody>';
+
+            logPreviewHTML += '<thead>';
+            logPreviewHTML += '<tr>';
+            logPreviewHTML += '<th>Log Entry</th>';
+            logPreviewHTML += '<th>Verdict</th>';
+            logPreviewHTML += '</tr>';
+            logPreviewHTML += '</thead>';
+            logPreviewHTML += '<tbody>';
+
+            logEntries.forEach((entry, index) => {
+                if (Array.isArray(entry) && entry.length === 2) {
+                    logPreviewHTML += '<tr>';
+                    logPreviewHTML += `<td style="background-color: #FFCCCC;">${entry[1]}</td>`;
+                    logPreviewHTML += `<td><span class="result-badge badge-${badgeColor}" style="font-size: 50px; display: inline-block; border-radius: 10%; padding: 6px 12px;">${entry[0]}</span></td>`;
+                    logPreviewHTML += '</tr>';
+                } else {
+                    logPreviewHTML += '<tr>';
+                    let color = '';
+
+                    if (index === logEntries.length - 1) {
+                        if (entry.includes("PASSED")) {
+                            color = 'success';
+                        } else if (entry.includes("ERROR")) {
+                            color = 'dark-red';
+                        } else if (entry.includes("FAILED")) {
+                            color = 'danger';
+                        } else if (entry.includes("SKIPPED")) {
+                            color = 'warning';
+                        } else if (entry.includes("TIMEOUT")) {
+                            color = 'blue';
+                        } else if (entry.includes("EXPECTED FAIL")) {
+                            color = 'success';
+                        } else {
+                            color = 'danger';
+                        }
+                    }
+
+                    logPreviewHTML += `<td><span class="result-badge badge-${color}">${entry}</span></td>`;
+                    logPreviewHTML += '<td></td>'; // Empty cell for verdict
+                    logPreviewHTML += '</tr>';
+                }
+            });
+
+            logPreviewHTML += '</tbody>';
+            logPreviewHTML += '</table>';
+            return logPreviewHTML;
+        }
+    </script>
+    <script>
+        // Get all progress bars with the "cool-loading" class
+        const progressContainer = document.querySelector('.custom-progress');
+
+        const progressBars = progressContainer.querySelectorAll('.cool-loading');
+
+        // Loop through each progress bar and set the animation keyframes
+        progressBars.forEach((bar) => {
+            const startWidth = parseInt(bar.getAttribute('data-start-width'), 10);
+            const endWidth = parseInt(bar.getAttribute('data-end-width'), 10);
+
+            // Define a unique animation name for each progress bar
+            const animationName = 'cool-loading-' + Math.random().toString(36).substr(2, 9);
+
+            // Define dynamic keyframes for each animation
+            const dynamicKeyframes = `@keyframes ${animationName} {
+                0% {
+                    width: ${startWidth}%;
+                }
+                100% {
+                    width: ${endWidth}%;
+                }
+            }`;
+
+            // Create a style element to add the dynamic keyframes
+            const style = document.createElement('style');
+            style.innerHTML = dynamicKeyframes;
+
+            // Append the style element to the document
+            document.head.appendChild(style);
+
+            // Apply the animation to the progress bar
+            bar.style.animation = `${animationName} 2s ease-in-out`; // Adjust the duration as needed
+            bar.style.transformOrigin = 'left';
+            bar.style.animationFillMode = 'forwards';
+
+        });
+    </script>
+    </body>
+    </html>

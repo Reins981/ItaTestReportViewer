@@ -14,45 +14,54 @@ SQL database and a modern frontend written in Javascript for displaying the retr
 
 Upon changes to the code base, call the following scripts in the order provided.
 
-*Note:*
-
-Try not to delete the spec file `ita_test_reporter.spec`. Rather focus on extending
-the spec file. In case you must delete it, be aware that you need to add all required modules and libraries manually.
-
 [source,bash]
 ----
 python3 create_req.py
 python3 build_exe.py
 ----
 
-The result is a `build_reporter` and `dist_reporter` directory. In the `dist_reporter` directory you will find the build executable `ita_test_reporter.exe` ready for usage.
+The result is a `build` directory. And in the sub-directory of this directory you will find the build executable `run.exe` ready for usage.
 
 == How to start the Ita Test Report Viewer
 
 * Start a EB Ita test run and wait till the `ita_test_report.db` is available.
 
-* Call the migration script.
+* Call the migration script with the path to your database file.
 [source,bash]
 ----
-python3 migrate_db.py
+python3 migrate_db.py path_to_your_database_file
 ----
-This script will do the following:
-
-1. The user must select the `ita_test_report.db` from a File Dialog Window,
-2. After selection, it prepares the database for the Ita Test Report Viewer and stores the migrated result database to the location given in the `app/config/config.json` file.
+This script will prepare the database for the Ita Test Report Viewer and also store the path to the migrated result database in the `app/config/config.json` file.
 
 *Note:*
 
-The Ita Test Report Viewer also uses a `config.json` file for reading the database. It is located in the `_internal/app/config` dir.
-Make sure the database path used by the migration script is the same for the Ita Test Report Viewer. If not, you have to copy the migrated result database to the correct location before starting the viewer.
+Make sure the database path used by the migration script is the same as for the Ita Test Report Viewer. If not, you have to copy the migrated result database to the correct location before starting the viewer.
 
-* Call the Ita Test Report Viewer executable
-
-[source,bash]
-----
-ita_test_reporter.exe
-----
+* Open the database via Right Mouse Click from the Windows Context Menu and select the `run.exe` for execution.
 
 * Open a Web Browser and navigate to `http://127.0.0.1:5000`
+
+== Alternative execution methods
+
+Open a windows cmd
+
+[soure, bash]
+----
+python migrate_db.py path_to_your_database_file
+run.exe path_to_your_database_file
+----
+
+or call the `run.exe` without the database argument. In this case the database path is taken from the  `app/config/config.json`.
+
+*Notes*:
+
+
+When this option is used, make sure the `migrate_db` script is also called without an argument.
+
+[soure, bash]
+----
+python migrate_db.py
+run.exe
+----
 
 

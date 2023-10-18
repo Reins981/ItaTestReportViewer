@@ -120,9 +120,10 @@ def colorize_test_step(test_case_sections, test_case_exec_id):
         if result:
             for row in result:
                 for i, test_case_section in enumerate(test_case_sections):
-                    # Check if message is contained in the test case section
-                    if row[1] in test_case_section:
-                        test_case_sections[i] = (row[0], test_case_sections[i])
+                    # Check if message is contained in the test case section or vice versa
+                    if test_case_section:
+                        if row[1] in test_case_section or test_case_section in row[1]:
+                            test_case_sections[i] = (row[0], test_case_sections[i])
         return test_case_sections
     except Exception as e:
         raise RuntimeError(str(e))
@@ -135,9 +136,29 @@ def extract_test_case_sections(log_entries, test_case_exec_id):
     post_append_section = False
     post_append_section_counter = 0
     test_case_pattern = re.compile(rf'Testcase:\s*(?P<test_case>{re.escape(test_case_exec_id)})')
+    test_case_pattern_2 = (
+        re.compile(rf'.*(?P<test_case>{re.escape(test_case_exec_id)})'))
+
+    exec_id_stripped = False
+    test_case_pattern_3 = ""
+    class_type = ""
+    if test_case_exec_id.endswith("_class_teardown"):
+        test_case_exec_id = test_case_exec_id.replace("_class_teardown", "")
+        exec_id_stripped = True
+        class_type = "teardown"
+    elif test_case_exec_id.endswith("_class_setup"):
+        test_case_exec_id = test_case_exec_id.replace("_class_setup", "")
+        exec_id_stripped = True
+        class_type = "setup"
+
+    if exec_id_stripped:
+        test_case_exec_id = test_case_exec_id[test_case_exec_id.rfind("/")+1:]
+        pattern = rf"Test class {class_type} failed for '(?P<test_case>{re.escape(test_case_exec_id)})'"
+        test_case_pattern_3 = re.compile(pattern)
 
     for log_entry in log_entries:
         log_entry = log_entry[0]
+
         match = re.match(test_case_pattern, log_entry)
         if match and not in_test_case_section:
             # We found the start
@@ -157,6 +178,21 @@ def extract_test_case_sections(log_entries, test_case_exec_id):
         elif post_append_section and post_append_section_counter >= 3:
             test_case_sections = current_section
             break
+
+    # Handle special cases
+    if not test_case_sections:
+        for log_entry in log_entries:
+            log_entry = log_entry[0]
+
+            match_1 = None
+            if exec_id_stripped:
+                match_1 = re.match(test_case_pattern_3, log_entry)
+
+            match_2 = re.match(test_case_pattern_2, log_entry)
+            if match_1 or match_2:
+                current_section.append(log_entry)
+                test_case_sections = current_section
+                break
 
     return test_case_sections
 
@@ -202,7 +238,11 @@ def get_test_cases_by_result_code():
                 )
             )
         connection.close()
-        return results
+
+        # Sort the results by test_case_uid
+        sorted_results = sorted(results, key=lambda x: x[1])
+
+        return sorted_results
     except Exception as e:
         raise RuntimeError(str(e))
 

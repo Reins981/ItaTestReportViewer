@@ -25,7 +25,7 @@ if __name__ == '__main__':
         if len(sys.argv) > 1:
             database = sys.argv[1]
             database_p = set_database(database)
-        app.run(debug=True)
+        app.run(debug=False)
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         input("Press Enter to exit...")

@@ -5,6 +5,7 @@ import os
 executables = [Executable(
     script="run.py",  # Replace with the name of your main script
     base="Console",  # Use "Console" for command-line applications
+    target_name="ItaReportViewer.exe"
 )]
 
 # Additional options, including packages and include files

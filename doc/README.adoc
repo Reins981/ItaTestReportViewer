@@ -1,12 +1,9 @@
-= Ita Test Report Viewer
+= Test Report Viewer
 
 == Introduction
 
-*Special Notes:*
 
-    This project is not maintained by the EB Ita Team.
-
-The Ita Test Report Viewer is a modern approach for displaying test management reports in a professional but simple way.
+The Test Report Viewer is a modern approach for displaying test management reports in a professional but simple way.
 It relies on a python flask server backend that retrieves test report data from a
 SQL database and a modern frontend written in Javascript for displaying the retrieved data.
 
@@ -22,20 +19,20 @@ python3 build_exe.py
 
 The result is a `build` directory. And in the sub-directory of this directory you will find the build executable `run.exe` ready for usage.
 
-== How to start the Ita Test Report Viewer
+== How to start the Test Report Viewer
 
-* Start a EB Ita test run and wait till the `ita_test_report.db` is available.
+* Start a test run and wait till the `ita_test_report.db` is available.
 
 * Call the migration script with the path to your database file.
 [source,bash]
 ----
 python3 migrate_db.py path_to_your_database_file
 ----
-This script will prepare the database for the Ita Test Report Viewer and also store the path to the migrated result database in the `app/config/config.json` file.
+This script will prepare the database for the Test Report Viewer and also store the path to the migrated result database in the `app/config/config.json` file.
 
 *Note:*
 
-Make sure the database path used by the migration script is the same as for the Ita Test Report Viewer. If not, you have to copy the migrated result database to the correct location before starting the viewer.
+Make sure the database path used by the migration script is the same as for the Test Report Viewer. If not, you have to copy the migrated result database to the correct location before starting the viewer.
 
 * Open the database via Right Mouse Click from the Windows Context Menu and select the `run.exe` for execution.
 
